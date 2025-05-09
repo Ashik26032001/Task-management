@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Task Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Dashboard</h1>
+    <div>
+      <span class="text-muted">{{ request.user.username }}</span>
+    </div>
+  </div>
+
+  <div class="row">
+   
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card primary h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50">Total Tasks</h6>
+            <h2 class="mb-0">{{ total_tasks }}</h2>
+          </div>
+          <i class="bi bi-list-task"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card warning h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50">Pending Tasks</h6>
+            <h2 class="mb-0">{{ pending_tasks }}</h2>
+          </div>
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card success h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50">Completed Tasks</h6>
+            <h2 class="mb-0">{{ completed_tasks }}</h2>
+          </div>
+          <i class="bi bi-check-circle"></i>
+        </div>
+      </div>
+    </div>
+
+    {% if request.user.is_superuser %}
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card info h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50">Total Users</h6>
+            <h2 class="mb-0">{{ total_users }}</h2>
+          </div>
+          <i class="bi bi-people"></i>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Recent Tasks</h5>
+          <a href="{% url 'tasks_list' %}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in recent_tasks %}
+              <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.assigned_to.username }}</td>
+                <td>{{ task.due_date }}</td>
+                <td>
+                  {% if task.status == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                  {% elif task.status == 'in_progress' %}
+                    <span class="badge bg-info">In Progress</span>
+                  {% elif task.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  {% if task.status == 'completed' %}
+                  <a href="{% url 'view_task_report' task.id %}" class="btn btn-sm btn-info">
+                    <i class="bi bi-file-text"></i>
+                  </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center">No tasks found</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+ <script>
+   
+    document.addEventListener('DOMContentLoaded', () => {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 2500);
+      });
+    });
+  </script>
+{% endblock %}

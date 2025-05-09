@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Task - Task Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Edit Task: {{ task.title }}</h1>
+    <a href="{% url 'tasks_list' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Tasks
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Task Information</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" action="">
+        {% csrf_token %}
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="assigned_to" class="form-label">Assign To</label>
+            <select class="form-select" id="assigned_to" name="assigned_to" {% if not request.user.is_superuser and request.user.profile.role != 'admin' %}disabled{% endif %} required>
+              <option value="">Select User</option>
+              {% for user in assignable_users %}
+              <option value="{{ user.id }}" {% if task.assigned_to.id == user.id %}selected{% endif %}>{{ user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" class="form-control" id="due_date" name="due_date" value="{{ task.due_date|date:'Y-m-d' }}" required>
+          </div>
+          <div class="col-md-6">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" onchange="toggleCompletionFields()">
+              <option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pending</option>
+              <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+              <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4" required>{{ task.description }}</textarea>
+          </div>
+        </div>
+
+        
+        <div id="completion_fields" style="display:none;">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="worked_hours" class="form-label">Worked Hours</label>
+              <input type="number" class="form-control" id="worked_hours" name="worked_hours" value="{{ task.worked_hours|default:'' }}">
+              <div class="form-text">Enter the number of hours spent on this task</div>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-12">
+              <label for="completion_report" class="form-label">Completion Report</label>
+              <textarea class="form-control" id="completion_report" name="completion_report" rows="5">{{ task.completion_report|default:'' }}</textarea>
+              <div class="form-text">Provide details on what was accomplished, challenges faced, and other relevant information</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Update Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleCompletionFields() {
+    const statusSelect = document.getElementById('status');
+    const completionFields = document.getElementById('completion_fields');
+    
+    if (statusSelect.value === 'completed') {
+      completionFields.style.display = 'block';
+    } else {
+      completionFields.style.display = 'none';
+    }
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleCompletionFields();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Task - Task Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Create New Task</h1>
+    <a href="{% url 'tasks_list' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Tasks
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Task Information</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" action="">
+        {% csrf_token %}
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="col-md-6">
+            <label for="assigned_to" class="form-label">Assign To</label>
+            <select class="form-select" id="assigned_to" name="assigned_to" required>
+              <option value="">Select User</option>
+              {% for user in assignable_users %}
+              <option value="{{ user.id }}">{{ user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" class="form-control" id="due_date" name="due_date" required>
+          </div>
+          <div class="col-md-6">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

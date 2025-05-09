@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User - Task Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Edit User: {{ user_obj.username }}</h1>
+    <a href="{% url 'users_list' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Users
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">User Information</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" action="">
+        {% csrf_token %}
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user_obj.username }}" required>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user_obj.email }}" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="first_name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user_obj.first_name }}">
+          </div>
+          <div class="col-md-6">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user_obj.last_name }}">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="password" class="form-label">Password (Leave blank to keep current)</label>
+            <input type="password" class="form-control" id="password" name="password">
+          </div>
+          <div class="col-md-6">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role" onchange="toggleAdminField()">
+              <option value="user" {% if user_obj.profile.role == 'user' %}selected{% endif %}>User</option>
+              <option value="admin" {% if user_obj.profile.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3" id="assigned_admin_div">
+          <div class="col-md-6">
+            <label for="assigned_admin" class="form-label">Assigned Admin</label>
+            <select class="form-select" id="assigned_admin" name="assigned_admin">
+              <option value="">Select Admin</option>
+              {% for admin in admins %}
+              <option value="{{ admin.id }}" {% if user_obj.profile.assigned_admin.id == admin.id %}selected{% endif %}>{{ admin.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Update User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleAdminField() {
+    const roleSelect = document.getElementById('role');
+    const assignedAdminDiv = document.getElementById('assigned_admin_div');
+    
+    if (roleSelect.value === 'admin') {
+      assignedAdminDiv.style.display = 'none';
+    } else {
+      assignedAdminDiv.style.display = 'block';
+    }
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleAdminField();
+  });
+</script>
+{% endblock %}

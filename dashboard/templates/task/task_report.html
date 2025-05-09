@@ -1,0 +1,72 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Task Report - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 admin-header">Task Completion Report</h1>
+    <div>
+      <a href="{% url 'admin_tasks_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Tasks
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">{{ task.title }}</h5>
+          <span class="badge bg-success">Completed</span>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Assigned To</h6>
+              <p class="mb-0">{{ task.assigned_to.username }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Created By</h6>
+              <p class="mb-0">{{ task.created_by.username }}</p>
+            </div>
+          </div>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Due Date</h6>
+              <p class="mb-0">{{ task.due_date|date:"F d, Y" }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Worked Hours</h6>
+              <p class="mb-0">{{ task.worked_hours }} hours</p>
+            </div>
+          </div>
+          
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <h6 class="text-muted mb-2">Description</h6>
+              <div class="p-3 bg-light rounded mb-3">
+                {{ task.description|linebreaks }}
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <h6 class="text-muted mb-2">Completion Report</h6>
+              <div class="p-3 bg-light rounded">
+                {{ task.completion_report|linebreaks }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between">
+          <span>Created: {{ task.created_at|date:"F d, Y" }}</span>
+          <span>Last Updated: {{ task.updated_at|date:"F d, Y" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

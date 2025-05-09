@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #ffffff;
+      padding: 3rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-control {
+      border-radius: 10px;
+    }
+
+    .btn-login {
+      background-color: #e74c3c;
+      border: none;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+
+    .btn-login:hover {
+      background-color: #c0392b;
+    }
+
+    .eye-icon {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2 class="text-center mb-4">Log In</h2>
+
+    {% for message in messages %}
+      <div class="alert alert-danger py-2 px-3 mb-3">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="form-floating mb-3 position-relative">
+        <input type="text" name="username" class="form-control" id="floatingInput" placeholder="Username" required>
+        <label for="floatingInput">Username</label>
+      </div>
+
+      <div class="form-floating mb-3 position-relative">
+        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+        <label for="floatingPassword">Password</label>
+        <i class="bi bi-eye eye-icon" id="togglePassword"></i>
+      </div>
+
+      <button type="submit" class="btn btn-login text-white fw-semibold w-100 py-2 mt-3">Log In</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Alert auto-dismiss
+    document.addEventListener('DOMContentLoaded', () => {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 2500);
+      });
+    });
+
+    // Toggle password visibility
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const input = document.getElementById("floatingPassword");
+      const icon = this;
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      icon.classList.toggle("bi-eye");
+      icon.classList.toggle("bi-eye-slash");
+    });
+  </script>
+</body>
+</html>

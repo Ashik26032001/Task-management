@@ -12,7 +12,8 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-class LoginView(APIView):
+    
+class UserLoginView(APIView):
     permission_classes = [AllowAny] 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -27,10 +28,93 @@ class LoginView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
+           
+            try:
+                profile = UserProfile.objects.get(user=user)
+                if profile.role != 'user':
+                    return Response(
+                        {'error': 'Access denied. Please use the appropriate login endpoint.'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            except UserProfile.DoesNotExist:
+                return Response(
+                    {'error': 'User profile not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminLoginView(APIView):
+    permission_classes = [AllowAny] 
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+            
+            user = authenticate(username=username, password=password)
+            if user is None:
+                return Response(
+                    {'error': 'Invalid credentials'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            
+            try:
+                profile = UserProfile.objects.get(user=user)
+                if profile.role != 'admin':
+                    return Response(
+                        {'error': 'Access denied. Admin credentials required.'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            except UserProfile.DoesNotExist:
+                return Response(
+                    {'error': 'User profile not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'role': 'admin'
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SuperadminLoginView(APIView):
+    permission_classes = [AllowAny] 
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+            
+            user = authenticate(username=username, password=password)
+            if user is None:
+                return Response(
+                    {'error': 'Invalid credentials'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+           
+            if not user.is_superuser:
+                return Response(
+                    {'error': 'Access denied. Superadmin credentials required.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'role': 'superadmin'
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,7 +158,7 @@ class TaskReportView(APIView):
         
         if not (is_superadmin or is_assigned_admin):
             return Response(
-                {'error': 'Permission denied'},
+                {'error': 'Permission denied. Only superadmins and assigned admins can view task reports.'},
                 status=status.HTTP_403_FORBIDDEN
             )
         
